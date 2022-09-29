@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { useEffect, useState, useCallback } from 'react'
-import { Message, Channel, PostgresSubUpdate } from 'types'
+import { Message, PostgresSubUpdate } from 'types'
 
 const getInitialMessages = async (
     client: SupabaseClient,
@@ -16,24 +16,12 @@ const getInitialMessages = async (
     return result.data?.length ? result.data.reverse() : []
 }
 
-const getInitialChannels = async (client: SupabaseClient) => {
-    const result = await client.from('channels').select<any, Channel>('*')
-
-    return result.data?.length ? result.data : []
-}
-
 const dbFilterChannelMessages = (channelId: string) => ({
     schema: 'public',
     table: 'messages',
     filter: `channel_id=eq.${channelId}`,
     event: 'INSERT',
 })
-
-const dbFilterChannels = {
-    schema: 'public',
-    table: 'channels',
-    event: 'INSERT',
-}
 
 export const useMessages = (
     client: SupabaseClient,
@@ -105,62 +93,8 @@ export const useMessages = (
     return [messages, createMessage]
 }
 
-export const useChannels = (
-    client: SupabaseClient,
-): [channels: Channel[], createChannel: (name: string) => void] => {
-    const channelsSubId = 'CHANNELS_SUB'
-    const [channels, setChannels] = useState<Channel[]>([])
-
-    useEffect(() => {
-        getInitialChannels(client).then(
-            (data) => setChannels(data),
-            (err: string) => console.log(`error fetching channels ${err}`),
-        )
-
-        const channel = client.channel(channelsSubId)
-        channel
-            .on(
-                'postgres_changes',
-                dbFilterChannels,
-                (update: PostgresSubUpdate<Channel>) => {
-                    if (!update.errors) {
-                        setChannels((oldChannels) => [
-                            ...oldChannels,
-                            update.new,
-                        ])
-                    }
-                },
-            )
-            .subscribe(() => console.log('subscribed to channels'))
-
-        return () => {
-            channel.unsubscribe().then(
-                () => console.log('Unsubscribed from channels'),
-                (err) => console.log(err),
-            )
-
-            client
-                .removeChannel(channel)
-                .catch((err: string) =>
-                    console.log(`Error removing channel ${err.toString()}`),
-                )
-        }
-    }, [])
-
-    const createChannel = useCallback((name: string) => {
-        client
-            .from('channels')
-            .insert([{ name }])
-            .then(
-                () => 'inserted new message',
-                (err) => console.log(err),
-            )
-    }, [])
-
-    return [channels, createChannel]
-}
-
-const defaultAuthKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hdG5mY3Rua3poeHFqdXRjdHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM3NjkwNTksImV4cCI6MTk3OTM0NTA1OX0.WqpDdtAjkgwMzoaL34J9pT9Y-aw1rvif9INa9UAEPeg'
+const defaultAuthKey =
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hdG5mY3Rua3poeHFqdXRjdHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM3NjkwNTksImV4cCI6MTk3OTM0NTA1OX0.WqpDdtAjkgwMzoaL34J9pT9Y-aw1rvif9INa9UAEPeg'
 const defaultUrl = 'https://oatnfctnkzhxqjutctxk.supabase.co'
 
 export const createSupabaseClient = (
