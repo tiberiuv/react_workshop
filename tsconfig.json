@@ -1,0 +1,31 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": false,
+        "strict": true,
+        "alwaysStrict": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "jsx": "preserve",
+        "allowSyntheticDefaultImports": true,
+        "noEmit": true,
+        "esModuleInterop": true,
+        "strictNullChecks": true,
+        "target": "es6",
+        "moduleResolution": "node",
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "module": "commonjs",
+        "baseUrl": "./src",
+        "paths": {
+            "common/": [ "./common/*" ]
+        }
+
+    },
+    "include": ["src/**/*.*"],
+    "exclude": [
+        "**/build/**",
+        "**/coverage/**",
+        "**/dist/**",
+        "**/node_modules/**"
+    ]
+}
