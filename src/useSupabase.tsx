@@ -160,7 +160,7 @@ export const useChannels = (
     return [channels, createChannel]
 }
 
-const defaultAuthKey = ''
+const defaultAuthKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9hdG5mY3Rua3poeHFqdXRjdHhrIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NjM3NjkwNTksImV4cCI6MTk3OTM0NTA1OX0.WqpDdtAjkgwMzoaL34J9pT9Y-aw1rvif9INa9UAEPeg'
 const defaultUrl = 'https://oatnfctnkzhxqjutctxk.supabase.co'
 
 export const createSupabaseClient = (
